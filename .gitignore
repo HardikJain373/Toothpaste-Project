@@ -8,4 +8,4 @@ detection/
 motor_control/__pycache__
 motor_control/dynamixel_sdk
 motor_control/motor_control.py
-motor_control/TestScript.py
+motor_control/TestScript.py        
