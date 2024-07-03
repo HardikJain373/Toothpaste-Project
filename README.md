@@ -1,4 +1,4 @@
-## Setup
+# Setup
 
 To run this project, clone the directory and set up a conda environment and run the following command
 
