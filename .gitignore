@@ -1,11 +1,2 @@
-env/
-DynamixelSDK-3.7.31/
-DynamixelSDK-master
-Flappy-bird-python-master/
-LEAP_Hand_API-main/
-PehleKaenv/
-detection/
-motor_control/__pycache__
-motor_control/dynamixel_sdk
-motor_control/motor_control.py
-motor_control/TestScript.py        
+transformer.py
+transformer.ipynb
