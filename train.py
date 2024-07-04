@@ -1,3 +1,5 @@
+from dynamixel_sdk import *
+
 DEVICENAME              = 'COM4'             # Check which port is being used on your controller
                                              # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0"
 # Initialize PortHandler instance
@@ -54,24 +56,25 @@ print(f"Target length is: {target} pixels!")
 initialize_motor(portHandler, packetHandler)
 
 length, rate = detectionUtils.find_state(model, camera_index=0)
-force_given = 0.02
 target_rate = 100
 
-give_force(0.03, 50)
 
 while(length < 0.9 * target):
     length, rate = detectionUtils.find_state(model, camera_index=0)
     print(f"Current length is: {length} pixels!")
     print(f"Current rate is: {rate} pixels/s!")
     
-    # Take action of increasing force
-    give_force(0.03, 50, portHandler, packetHandler)
+    # Take action of increasing position
+    
 
-    
-#     # Find force to be given
-    
-#     # Apply force
-    
-     
+
+
+
+
+
+
+
+
+# give_force_with_initialization(0.5, 50, 9000, portHandler, packetHandler)
     
     

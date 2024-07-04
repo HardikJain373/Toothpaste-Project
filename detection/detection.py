@@ -4,7 +4,7 @@ import cv2
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-from detectionUtils import *
+# from detectionUtils import *
 from ultralytics import YOLO
 import pathlib
 
