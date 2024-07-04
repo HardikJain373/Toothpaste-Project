@@ -24,16 +24,9 @@ ADDR_TORQUE_ENABLE      = 64
 ADDR_GOAL_POSITION      = 116
 ADDR_PRESENT_POSITION   = 132
 ADDR_OPERATING_MODE     = 11
-ADDR_HARDWARE_ERROR_STATUS = 70
 
-# Protocol version
-PROTOCOL_VERSION        = 2.0
 
-# Default setting
-DXL_ID                  = 1                  # Dynamixel ID: 1
-BAUDRATE                = 57600              # Dynamixel default baudrate : 57600
-DEVICENAME              = 'COM4'             # Check which port is being used on your controller
-                                             # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0"
+
 
 TORQUE_ENABLE           = 1                  # Value for enabling the torque
 TORQUE_DISABLE          = 0                  # Value for disabling the torque
@@ -42,42 +35,12 @@ DXL_MAXIMUM_POSITION_VALUE  = 2048 * 5       # 5 turns
 DXL_MOVING_STATUS_THRESHOLD = 50             # Dynamixel moving status threshold
 EXTENDED_POSITION_CONTROL_MODE = 4
 
-# Initialize PortHandler instance
-portHandler = PortHandler(DEVICENAME)
-
-# Initialize PacketHandler instance
-packetHandler = PacketHandler(PROTOCOL_VERSION)
-
-# Open port
-if portHandler.openPort():
-    print("Succeeded to open the port")
-else:
-    print("Failed to open the port")
-    print("Press any key to terminate...")
-    quit()
-
-# Set port baudrate
-if portHandler.setBaudRate(BAUDRATE):
-    print("Succeeded to change the baudrate")
-else:
-    print("Failed to change the baudrate")
-    print("Press any key to terminate...")
-    quit()
-
-
-# Check for hardware errors
-dxl_hardware_error, dxl_comm_result, dxl_error = packetHandler.read1ByteTxRx(portHandler, DXL_ID, ADDR_HARDWARE_ERROR_STATUS)
-if dxl_comm_result != COMM_SUCCESS:
-    print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-elif dxl_error != 0:
-    print("%s" % packetHandler.getRxPacketError(dxl_error))
-else:
-    if dxl_hardware_error != 0:
-        print("Hardware Error Status: %d" % dxl_hardware_error)
 
 
 
-def initialize_motor_with_initial_position(portHandler, packetHandler, target):    
+
+
+def initialize_motor_with_initial_position(portHandler, packetHandler, target, DXL_ID=1):    
     # Disable Dynamixel Torque
     dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_TORQUE_ENABLE, TORQUE_DISABLE)
     if dxl_comm_result != COMM_SUCCESS:
@@ -129,7 +92,7 @@ def initialize_motor_with_initial_position(portHandler, packetHandler, target):
             break
 
 
-def initialize_motor(portHandler, packetHandler)
+def initialize_motor(portHandler, packetHandler, DXL_ID=1):
     # Disable Dynamixel Torque
     dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_TORQUE_ENABLE, TORQUE_DISABLE)
     if dxl_comm_result != COMM_SUCCESS:
@@ -160,7 +123,7 @@ def initialize_motor(portHandler, packetHandler)
 
 
 
-def read_position(portHandler, packetHandler):
+def read_position(portHandler, packetHandler, DXL_ID=1):
     # Read present position
     dxl_present_position, dxl_comm_result, dxl_error = packetHandler.read4ByteTxRx(portHandler, DXL_ID, ADDR_PRESENT_POSITION)
     if dxl_comm_result != COMM_SUCCESS:
@@ -172,7 +135,7 @@ def read_position(portHandler, packetHandler):
     
     return dxl_present_position
 
-def write_position(portHandler, packetHandler, goal_position):
+def write_position(portHandler, packetHandler, goal_position, DXL_ID=1):
     # Write goal position to 5 turns
     dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, DXL_ID, ADDR_GOAL_POSITION, goal_position)
     if dxl_comm_result != COMM_SUCCESS:
