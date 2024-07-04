@@ -37,7 +37,7 @@ DEVICENAME              = 'COM4'             # Check which port is being used on
 
 TORQUE_ENABLE           = 1                  # Value for enabling the torque
 TORQUE_DISABLE          = 0                  # Value for disabling the torque
-DXL_MINIMUM_POSITION_VALUE  = 0     # Dynamixel will rotate between this value
+DXL_MINIMUM_POSITION_VALUE  = 1000           # Dynamixel will rotate between this value
 DXL_MAXIMUM_POSITION_VALUE  = 2048 * 5       # 5 turns
 DXL_MOVING_STATUS_THRESHOLD = 50             # Dynamixel moving status threshold
 EXTENDED_POSITION_CONTROL_MODE = 4
@@ -77,7 +77,7 @@ else:
 
 
 
-def initialize_motor(portHandler, packetHandler):    
+def initialize_motor_with_initial_position(portHandler, packetHandler, target):    
     # Disable Dynamixel Torque
     dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_TORQUE_ENABLE, TORQUE_DISABLE)
     if dxl_comm_result != COMM_SUCCESS:
@@ -106,16 +106,16 @@ def initialize_motor(portHandler, packetHandler):
         print("Dynamixel has been successfully connected")
 
 
-    # Write goal position to 0 to reset the position
-    dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, DXL_ID, ADDR_GOAL_POSITION, DXL_MINIMUM_POSITION_VALUE)
+    # Write goal position to target to reset the position
+    dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, DXL_ID, ADDR_GOAL_POSITION, target)
     if dxl_comm_result != COMM_SUCCESS:
         print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
     elif dxl_error != 0:
         print("%s" % packetHandler.getRxPacketError(dxl_error))
     else:
-        print("Goal position set to 0")
+        print(f"Goal position set to {target}")
 
-    # Read present position until it reaches 0
+    # # Read present position until it reaches target
     while True:
         dxl_present_position, dxl_comm_result, dxl_error = packetHandler.read4ByteTxRx(portHandler, DXL_ID, ADDR_PRESENT_POSITION)
         if dxl_comm_result != COMM_SUCCESS:
@@ -123,10 +123,41 @@ def initialize_motor(portHandler, packetHandler):
         elif dxl_error != 0:
             print("%s" % packetHandler.getRxPacketError(dxl_error))
 
-        print("[ID:%03d] GoalPos:%d  PresPos:%d" % (DXL_ID, DXL_MINIMUM_POSITION_VALUE, dxl_present_position))
+        print("[ID:%03d] GoalPos:%d  PresPos:%d" % (DXL_ID, target, dxl_present_position))
 
-        if abs(DXL_MINIMUM_POSITION_VALUE - dxl_present_position) <= DXL_MOVING_STATUS_THRESHOLD:
+        if abs(target - dxl_present_position) <= DXL_MOVING_STATUS_THRESHOLD:
             break
+
+
+def initialize_motor(portHandler, packetHandler)
+    # Disable Dynamixel Torque
+    dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_TORQUE_ENABLE, TORQUE_DISABLE)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+        print("%s" % packetHandler.getRxPacketError(dxl_error))
+    else:
+        print("Dynamixel has been successfully connected")
+
+    # Set operating mode to extended position control mode
+    dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_OPERATING_MODE, EXTENDED_POSITION_CONTROL_MODE)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+        print("%s" % packetHandler.getRxPacketError(dxl_error))
+    else:
+        print("Operating mode set to extended position control mode")
+
+    # Enable Dynamixel Torque
+    dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, DXL_ID, ADDR_TORQUE_ENABLE, TORQUE_ENABLE)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+        print("%s" % packetHandler.getRxPacketError(dxl_error))
+    else:
+        print("Dynamixel has been successfully connected")
+
+
 
 
 def read_position(portHandler, packetHandler):
@@ -136,8 +167,8 @@ def read_position(portHandler, packetHandler):
         print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
     elif dxl_error != 0:
         print("%s" % packetHandler.getRxPacketError(dxl_error))
-    else:
-        print(f"Present position is {dxl_present_position/4096} rotations")
+    # else:
+    #     print(f"Present position is {dxl_present_position/4096} rotations")
     
     return dxl_present_position
 
@@ -148,8 +179,8 @@ def write_position(portHandler, packetHandler, goal_position):
         print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
     elif dxl_error != 0:
         print("%s" % packetHandler.getRxPacketError(dxl_error))
-    else:
-        print(f"Goal position set to {goal_position/4096} rotations")
+    # else:
+    #     print(f"Goal position set to {goal_position/4096} rotations")
 
     # Read present position until it reaches the goal
     while True:
@@ -159,7 +190,7 @@ def write_position(portHandler, packetHandler, goal_position):
         elif dxl_error != 0:
             print("%s" % packetHandler.getRxPacketError(dxl_error))
 
-        print("[ID:%03d] GoalPos:%d  PresPos:%d" % (DXL_ID, goal_position, dxl_present_position))
+        # print("[ID:%03d] GoalPos:%d  PresPos:%d" % (DXL_ID, goal_position, dxl_present_position))
 
         if abs(goal_position - dxl_present_position) <= DXL_MOVING_STATUS_THRESHOLD:
             break
