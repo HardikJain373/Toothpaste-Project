@@ -28,7 +28,7 @@ def read_force():
     return force_reading
         
 
-def give_force_with_initialization(target_force, rate, initial):
+def give_force_with_initialization(target_force, rate, initial, portHandler, packetHandler):
 
     # Initialize the motor
     initialize_motor_with_initial_position(portHandler, packetHandler, initial)
@@ -50,12 +50,12 @@ def give_force_with_initialization(target_force, rate, initial):
 
 
 
-give_force_with_initialization(0.02, 50, 9000)
+# give_force_with_initialization(0.02, 50, 9000)
 
 # while True:
 #     read_force()
 
-def give_force(target_force, rate):
+def give_force(target_force, rate, portHandler, packetHandler):
     while True:
         
         ser.reset_input_buffer()

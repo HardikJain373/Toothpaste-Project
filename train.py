@@ -65,7 +65,7 @@ while(length < 0.9 * target):
     print(f"Current rate is: {rate} pixels/s!")
     
     # Take action of increasing force
-    give_force(0.03, 50)
+    give_force(0.03, 50, portHandler, packetHandler)
 
     
 #     # Find force to be given
