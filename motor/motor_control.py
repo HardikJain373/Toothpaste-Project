@@ -1,15 +1,7 @@
 import serial
 import time
 
-
-
-# write_position(portHandler, packetHandler, 9000) # Increasing goal position lowers the screw
-
-ser = serial.Serial('COM3', 9600)  # Arduino connected to COM3
-
-
 import os
-# from detectionUtils import *
 
 if os.name == 'nt':
     import msvcrt
@@ -26,6 +18,14 @@ else:
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
+
+
+# write_position(portHandler, packetHandler, 9000) # Increasing goal position lowers the screw
+# ser = serial.Serial('/dev/ttyUSB0', 9600)  # Arduino connected to COM3
+
+
+import os
+# from detectionUtils import *
 
 from dynamixel_sdk import *                    # Uses Dynamixel SDK library
 
@@ -181,7 +181,7 @@ def write_position(portHandler, packetHandler, goal_position, DXL_ID=1):
 
 
 
-def read_force():
+def read_force(ser):
     force_reading = None
     count = 0
     while force_reading == None:
@@ -198,7 +198,7 @@ def read_force():
     return force_reading
         
 
-def give_force_with_initialization(target_force, rate, initial, portHandler, packetHandler):
+def give_force_with_initialization(target_force, rate, initial, portHandler, packetHandler, ser):
 
     # Initialize the motor
     initialize_motor_with_initial_position(portHandler, packetHandler, initial)
@@ -225,7 +225,7 @@ def give_force_with_initialization(target_force, rate, initial, portHandler, pac
 # while True:
 #     read_force()
 
-def give_force(target_force, rate, portHandler, packetHandler):
+def give_force(target_force, rate, portHandler, packetHandler, ser):
     while True:
         
         ser.reset_input_buffer()

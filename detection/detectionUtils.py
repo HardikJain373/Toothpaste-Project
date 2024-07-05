@@ -8,19 +8,26 @@ from time import time
 TOOTHPASTE_INDEX = 1
 TOOTHBRUSH_INDEX = 0  
 
-def find_target_length(model, camera_index=0):
+def find_target_length(model, camera_index=0, show_camera=False):
     capture = cv2.VideoCapture(camera_index)
     if not capture.isOpened():
         return Exception("Camera not found")
     
-    ret, frame = capture.read()
-    if not ret:
-        return Exception("Error, frame could not be read!")
-    
-    frame_RGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    processed_frame = model(frame_RGB)
     
     while(True):
+        ret, frame = capture.read()
+        if not ret:
+            return Exception("Error, frame could not be read!")
+        
+        frame_RGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        processed_frame = model(frame_RGB)
+    
+        if(show_camera):
+            cv2.imshow('Video', cv2.cvtColor(processed_frame[0].plot(), cv2.COLOR_RGB2BGR))
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    
+        
         if(TOOTHBRUSH_INDEX in processed_frame[0].boxes.cls):
             idx = where(processed_frame[0].boxes.cls == TOOTHBRUSH_INDEX)[0][0]
             bounding_box = processed_frame[0].boxes.xyxy[idx]
@@ -34,7 +41,7 @@ def find_target_length(model, camera_index=0):
     return toothbrush_length
     
 
-def find_state(model, camera_index=0):
+def find_state(model, camera_index=0, show_processed_video=False):
     capture = cv2.VideoCapture(camera_index)
     if not capture.isOpened():
         return Exception("Camera not found")
@@ -43,7 +50,7 @@ def find_state(model, camera_index=0):
     fig, ax = plt.subplots()
     while(True):
         a=time()
-        length_toothpaste, rate_toothpaste = find_length_and_rate(model, capture, show_processed_video=True, verbose=True)
+        length_toothpaste, rate_toothpaste = find_length_and_rate(model, capture, show_processed_video=show_processed_video, verbose=True)
         b=time()
         print(f"FPS: {1/(b-a)}")
         print(f"Length of toothpaste is: {length_toothpaste} pixels!")
@@ -101,6 +108,9 @@ def find_length_and_rate(model, capture, show_processed_video=False, verbose=Tru
         toothpaste_length2 = 0
 
 
+    if(toothpaste_length1 == 0 or toothpaste_length2 == 0):
+        return 0, 0
+    
     rate = (toothpaste_length2 - toothpaste_length1)/time_delta
 
     # Showing the processed video if required
@@ -109,4 +119,22 @@ def find_length_and_rate(model, capture, show_processed_video=False, verbose=Tru
 
     return toothpaste_length2, rate
 
+
+def show_camera(camera_index):
+    capture = cv2.VideoCapture(camera_index)
+    if not capture.isOpened():
+        return Exception("Camera not found")
+    
+    while(True):
+        ret, frame = capture.read()
+        if not ret:
+            return Exception("Error, frame could not be read!")
+        
+        cv2.imshow("Camera", frame)
+        if cv2.waitKey(10) & 0xFF == ord("q"):
+            break
+
+    capture.release()
+    cv2.destroyAllWindows()
+    return None
 

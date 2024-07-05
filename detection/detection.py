@@ -8,10 +8,10 @@ import numpy as np
 from ultralytics import YOLO
 import pathlib
 
-cwd = pathlib.Path()
-print(cwd)
+# cwd = pathlib.Path()
+# print(cwd)
 
-# model = YOLO(r"motor_control/runs/detect/train3/weights/best.pt")
+# model = YOLO(r"runs/detect/train3/weights/best.pt")
 
 # height = display_state_from_camera(model, camera_index=0, flip=True, verbose=True)
 # t = find_state(model, camera_index=0)
